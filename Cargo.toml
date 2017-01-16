@@ -7,6 +7,7 @@ readme = "README.md"
 version = "0.1.0"
 license = "MIT"
 keywords = ["backtrace", "error", "result"]
+documentation = "https://docs.rs/trace-error/"
 
 [dependencies]
 backtrace = "0.3.0"
