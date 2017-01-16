@@ -87,6 +87,8 @@
 //! }
 //! ```
 
+#![deny(missing_docs)]
+
 extern crate backtrace as bt;
 
 pub mod backtrace;
