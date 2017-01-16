@@ -64,7 +64,7 @@ impl DefaultBacktraceFmt {
         } else if let Some(lineno) = lineno {
             format!("at <anonymous>:{}\n", lineno)
         } else {
-            format!("at <anonymous>\n")
+            "at <anonymous>\n".to_string()
         };
 
         begin + end.as_str()
@@ -109,7 +109,7 @@ pub fn format_trace<Fmt: BacktraceFmt>(header: bool, line: u32, file: &str) -> S
             let before = count;
 
             resolve(frame.ip(), |symbol| {
-                traces += Fmt::format(count - IGNORE_COUNT, &symbol).as_str();
+                traces += Fmt::format(count - IGNORE_COUNT, symbol).as_str();
 
                 count += 1;
             });
@@ -118,7 +118,7 @@ pub fn format_trace<Fmt: BacktraceFmt>(header: bool, line: u32, file: &str) -> S
             if count == before {
                 // If `symbol_address` doesn't work, oh well.
                 resolve(frame.symbol_address(), |symbol| {
-                    traces += Fmt::format(count - IGNORE_COUNT, &symbol).as_str();
+                    traces += Fmt::format(count - IGNORE_COUNT, symbol).as_str();
 
                     count += 1;
                 });

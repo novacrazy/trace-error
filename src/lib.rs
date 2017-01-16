@@ -86,7 +86,7 @@
 //!     }
 //! }
 //! ```
-
+#![allow(unknown_lints, inline_always)]
 #![deny(missing_docs)]
 
 extern crate backtrace as bt;
