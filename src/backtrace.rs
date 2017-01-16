@@ -149,7 +149,7 @@ impl Debug for SourceBacktrace {
 }
 
 impl SourceBacktrace {
-    /// Create a new `SourceBacktrace` if you know the file and file
+    /// Create a new `SourceBacktrace` if you know the line and file
     pub fn new(line: u32, file: &'static str) -> SourceBacktrace {
         SourceBacktrace {
             backtrace: Backtrace::new(),
