@@ -147,8 +147,6 @@ impl<E: Error> Trace<E> {
 
 unsafe impl<E: Error> Send for Trace<E> where E: Send {}
 
-unsafe impl<E: Error> Sync for Trace<E> where E: Sync {}
-
 impl<E: Error> Deref for Trace<E> {
     type Target = E;
 
