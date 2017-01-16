@@ -1,0 +1,7 @@
+[package]
+authors = ["Aaron Trent <novacrazy@gmail.com>"]
+name = "trace-error"
+version = "0.1.0"
+
+[dependencies]
+backtrace = "0.3.0"
