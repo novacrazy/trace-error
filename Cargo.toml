@@ -4,9 +4,10 @@ authors = ["Aaron Trent <novacrazy@gmail.com>"]
 description = "Extensions to Rust's error system to automatically include backtraces"
 repository = "https://github.com/novacrazy/trace-error"
 readme = "README.md"
-version = "0.1.2"
+version = "0.1.3"
 license = "MIT"
 keywords = ["backtrace", "error", "result"]
+categories = ["rust-patterns"]
 documentation = "https://docs.rs/trace-error/"
 
 [dependencies]
