@@ -9,7 +9,10 @@
 //! `throw!`, `try_throw!`, and `try_rethrow!`
 //!
 //! Although the `?` syntax was just introduced, `trace-error` is not yet compatible with it until the `Carrier` trait is stabilized. As a result,
-//! all instances of `try!` and `?` should be replaced with `try_throw!` if you intend to use this crate to its fullest.
+//! all instances of `try!` and `?` should be replaced with `try_throw!` if you intend to use this crate to its fullest. However, the `?` operator
+//! can be used for `Result<_, Trace<E>>` when the return value is also a `Result` using `Trace<E>`, just because `From` is implemented for types for itself.
+//!
+//! If the `Trace` being returned in a result does **NOT** contain the same error type, but they are convertible, use `try_rethrow!` to convert the inner error type.
 //!
 //! Example:
 //!
