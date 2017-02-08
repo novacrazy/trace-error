@@ -16,7 +16,7 @@
 //!
 //! Example:
 //!
-//! ```should_panic
+//! ```
 //! #[macro_use]
 //! extern crate trace_error;
 //!
@@ -25,7 +25,7 @@
 //! use std::io;
 //! use std::fs::File;
 //!
-//! use trace_error::*;
+//! use trace_error::TraceResult;
 //!
 //! pub type MyResultType<T> = TraceResult<T, MyErrorType>;
 //!
@@ -60,10 +60,6 @@
 //! }
 //!
 //! fn basic() -> MyResultType<i32> {
-//!     //Something may throw
-//!     throw!(MyErrorType::ErrorOne);
-//!
-//!     // Or return an Ok value
 //!     Ok(42)
 //! }
 //!
@@ -85,7 +81,7 @@
 //!         Ok(_) => println!("Success!"),
 //!         // Here, err is the Trace<E>, which can be printed normally,
 //!         // showing both the error and the backtrace.
-//!         Err(err) => panic!("Error: {}", err)
+//!         Err(err) => println!("Error: {}", err)
 //!     }
 //! }
 //! ```
