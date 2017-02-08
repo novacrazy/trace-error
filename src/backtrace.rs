@@ -44,6 +44,7 @@ pub trait BacktraceFmt {
 pub struct DefaultBacktraceFmt;
 
 impl DefaultBacktraceFmt {
+    #[inline(never)]
     fn real_format(count: u32,
                    name: Option<SymbolName>,
                    addr: Option<*mut c_void>,
@@ -169,6 +170,7 @@ impl SourceBacktrace {
     }
 
     /// Format this backtrace with the given formatter and the given options
+    #[inline(never)]
     pub fn format<Fmt: BacktraceFmt>(&self, header: bool, reverse: bool) -> String {
         let mut traces = if header {
             format!("Stack backtrace for task \"<{}>\" at line {} of \"{}\":\n",
@@ -180,7 +182,8 @@ impl SourceBacktrace {
         let mut count = 0;
 
         if reverse {
-            let mut symbols = Vec::new();
+            // We can assume at least one symbol per frame
+            let mut symbols = Vec::with_capacity(self.backtrace.frames().len());
 
             for frame in self.backtrace.frames() {
                 for symbol in frame.symbols() {
