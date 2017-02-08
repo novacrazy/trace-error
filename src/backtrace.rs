@@ -89,10 +89,6 @@ impl BacktraceFmt for DefaultBacktraceFmt {
 /// The actual call to `format_trace` and `trace` are ignored.
 #[inline(never)]
 pub fn format_trace<Fmt: BacktraceFmt>(header: bool, line: u32, file: &str) -> String {
-    // Ignore `format_trace` and `backtrace::trace` calls, both of which are marked as #[inline(never)],
-    // so they will always show up.
-    const IGNORE_COUNT: u32 = 2;
-
     let mut traces = if header {
         format!("Stack backtrace for task \"<{}>\" at line {} of \"{}\":\n",
                 thread::current().name().unwrap_or("unnamed"), line, file)
@@ -103,26 +99,22 @@ pub fn format_trace<Fmt: BacktraceFmt>(header: bool, line: u32, file: &str) -> S
     let mut count = 0;
 
     trace(|frame| {
-        if count < IGNORE_COUNT {
-            count += 1;
-        } else {
-            let before = count;
+        let before = count;
 
-            resolve(frame.ip(), |symbol| {
-                traces += Fmt::format(count - IGNORE_COUNT, symbol).as_str();
+        resolve(frame.ip(), |symbol| {
+            traces += Fmt::format(count, symbol).as_str();
+
+            count += 1;
+        });
+
+        // These will be equal if `resolve_cb` was not invoked
+        if count == before {
+            // If `symbol_address` doesn't work, oh well.
+            resolve(frame.symbol_address(), |symbol| {
+                traces += Fmt::format(count, symbol).as_str();
 
                 count += 1;
             });
-
-            // These will be equal if `resolve_cb` was not invoked
-            if count == before {
-                // If `symbol_address` doesn't work, oh well.
-                resolve(frame.symbol_address(), |symbol| {
-                    traces += Fmt::format(count - IGNORE_COUNT, symbol).as_str();
-
-                    count += 1;
-                });
-            }
         }
 
         // Always continue
@@ -178,9 +170,6 @@ impl SourceBacktrace {
 
     /// Format this backtrace with the given formatter and the given options
     pub fn format<Fmt: BacktraceFmt>(&self, header: bool, reverse: bool) -> String {
-        // Ignore `backtrace::trace` call
-        const IGNORE_COUNT: u32 = 1;
-
         let mut traces = if header {
             format!("Stack backtrace for task \"<{}>\" at line {} of \"{}\":\n",
                     thread::current().name().unwrap_or("unnamed"), self.line, self.file)
@@ -200,38 +189,14 @@ impl SourceBacktrace {
             }
 
             for symbol in symbols.iter().rev() {
-                if count >= IGNORE_COUNT {
-                    if let Some(name) = symbol.name() {
-                        if let Some(name_str) = name.as_str() {
-                            // Checks for `Backtrace::new` and `ThinBacktrace::new`
-                            if name_str.contains("Backtrace::new") {
-                                // Ignore and don't increment `count`
-                                continue;
-                            }
-                        }
-                    }
-
-                    traces += Fmt::format_captured(count - IGNORE_COUNT, symbol).as_str();
-                }
+                traces += Fmt::format_captured(count, symbol).as_str();
 
                 count += 1;
             }
         } else {
             for frame in self.backtrace.frames() {
                 for symbol in frame.symbols() {
-                    if count >= IGNORE_COUNT {
-                        if let Some(name) = symbol.name() {
-                            if let Some(name_str) = name.as_str() {
-                                // Checks for `Backtrace::new` AND `ThinBacktrace::new`
-                                if name_str.contains("Backtrace::new") {
-                                    // Ignore and don't increment `count`
-                                    continue;
-                                }
-                            }
-                        }
-
-                        traces += Fmt::format_captured(count - IGNORE_COUNT, symbol).as_str();
-                    }
+                    traces += Fmt::format_captured(count, symbol).as_str();
 
                     count += 1;
                 }
