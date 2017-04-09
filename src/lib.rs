@@ -204,3 +204,13 @@ macro_rules! try_rethrow {
         }
     })
 }
+
+#[macro_export]
+macro_rules! trace_start {
+    ($err:expr) => {
+        ::std::result::Result::Err($crate::Trace::new(
+            ::std::convert::From::from($err),
+            ::std::boxed::Box::new($crate::backtrace::SourceBacktrace::new(line!(), file!()))
+        ))
+    }
+}
