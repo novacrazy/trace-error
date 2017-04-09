@@ -161,15 +161,13 @@ impl<E: Error> Display for Trace<E> {
     }
 }
 
-/// Creates a new `Result::Err(Trace<E>)` and immediately returns it
+/// Creates a new `Result::Err(Trace<E>)` and immediately returns it.
+///
+/// This relies on the return type of the function to
+/// provide type inference for the `Result::Ok(T)` type.
 #[macro_export]
 macro_rules! throw {
-    ($err:expr) => {
-        return ::std::result::Result::Err($crate::Trace::new(
-            ::std::convert::From::from($err),
-            ::std::boxed::Box::new($crate::backtrace::SourceBacktrace::new(line!(), file!()))
-        ))
-    }
+    ($err:expr) => { return trace_error!($err) }
 }
 
 /// Like `try!`, but invokes `throw!` on the error value if it exists, converting it to `Result::Err(Trace<E>)`
@@ -177,6 +175,9 @@ macro_rules! throw {
 /// Note that the backtrace will only go as far as the location this macro was invoked
 ///
 /// This macro will try to call `From::from` on the error to convert it if necessary, just like `try!`
+///
+/// This relies on the return type of the function to
+/// provide type inference for the `Result::Ok(T)` type.
 #[macro_export]
 macro_rules! try_throw {
     ($res:expr) => (match $res {
@@ -195,6 +196,9 @@ pub fn _assert_trace_result<T, E: Error>(res: TraceResult<T, E>) -> TraceResult<
 ///
 /// This macro will try to call `Trace::convert` on the trace to convert the inner error if necessary,
 /// similarly to `try!`
+///
+/// This relies on the return type of the function to
+/// provide type inference for the `Result::Ok(T)` type.
 #[macro_export]
 macro_rules! try_rethrow {
     ($res:expr) => (match $crate::_assert_trace_result($res) {
@@ -205,12 +209,24 @@ macro_rules! try_rethrow {
     })
 }
 
+/// The core macro that creates the `Result::Err(Trace<E>)` value,
+/// but does not return it immediately.
+///
+/// An optional second parameter can be given to indicate the type the `Result`
+/// should be if type inference cannot determine it automatically.
 #[macro_export]
-macro_rules! trace_start {
+macro_rules! trace_error {
     ($err:expr) => {
         ::std::result::Result::Err($crate::Trace::new(
             ::std::convert::From::from($err),
             ::std::boxed::Box::new($crate::backtrace::SourceBacktrace::new(line!(), file!()))
         ))
-    }
+    };
+
+    ($err:expr, $t:ty) => {
+        ::std::convert::From::<$t>::from(::std::result::Result::Err($crate::Trace::new(
+            ::std::convert::From::from($err),
+            ::std::boxed::Box::new($crate::backtrace::SourceBacktrace::new(line!(), file!()))
+        )))
+    };
 }

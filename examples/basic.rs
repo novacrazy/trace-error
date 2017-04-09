@@ -58,6 +58,11 @@ fn example() -> MyResultType<()> {
 }
 
 fn main() {
+    match trace_error!(MyErrorType::ErrorOne, MyResultType<()>) {
+        Ok(_) => panic!("This shouldn't happen"),
+        Err(err) => println!("Error: {}", err),
+    }
+
     match example() {
         Ok(_) => println!("Success!"),
         // Here, err is the Trace<E>, which can be printed normally,
