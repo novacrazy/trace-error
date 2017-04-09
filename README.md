@@ -15,6 +15,8 @@ Although the `?` syntax was just introduced, `trace-error` is not yet compatible
 all instances of `try!` and `?` should be replaced with `try_throw!` if you intend to use this crate to its fullest. However, the `?` operator
 can be used for `Result<_, Trace<E>>` when the return value is also a `Result` using `Trace<E>`, just because `From` is implemented for types for itself.
 
+Additionally, if you must use the `Result<T, Trace<E>>` directly instead of immediately returning it, you can use the `trace_error!` macro to create it with the desired error value.
+
 If the `Trace` being returned in a result does **NOT** contain the same error type, but they are convertible, use `try_rethrow!` to convert the inner error type.
 
 Example:

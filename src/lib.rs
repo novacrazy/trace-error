@@ -14,6 +14,8 @@
 //!
 //! If the `Trace` being returned in a result does **NOT** contain the same error type, but they are convertible, use `try_rethrow!` to convert the inner error type.
 //!
+//! Additionally, if you must use the `Result<T, Trace<E>>` directly instead of immediately returning it, you can use the `trace_error!` macro to create it with the desired error value.
+//!
 //! Example:
 //!
 //! ```
